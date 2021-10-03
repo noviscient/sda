@@ -1,39 +1,69 @@
-Initializing State objects (S_0)
-- should we have State objects for each level
-    - one State object per Strategy
-        - 
-    - one State object per Solution
-        - 
-    - State object for Firm
-        - 
+Design questions
+Should we have State objects for each level?
+    - one State object per Strategy () 
+    - one State object per Solution () 
+    - State object for Firm () 
 
-Transition State object (S_t -> S_{t + 1})
-- 
+Main loop
+- define set of policies to search over X
+- loop over policies, X^{\pi}
+    - initiate with S_0
+    - loop from t = 0 to t = T
+        - get decision, x_t from X^{\pi}(S_t)
+        - simulate or source next W_t
+        - State transitions (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
+        - calculate contribution, C(S_t, X^\{pi}(S-t), W_{t+1}) and sum and save
+- select policy that maximises sum of contributions
+
+Decision Policy class (S_t)
+""" First define the decisions
+    choose decision class: PFA, CFA, VFA, DLA or hybrid"""
+- decision method (X^{\pi}(S_t) -> x_t)
+- returns x_t
+
+State class (S_t)
+""" All information on costs, rewards, constraints, transition function """
+- initialization (S_0)
+- variables ()
+- transition method (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
+- returns S_{t+1}
+
+Exog_Info class ()
+""" new information arriving after time, t """
+- simulate method(W_t -> W_{t+1}) 
+- source new exog_info 
+- returns W_{t+1}
+
+Model class (S_t, x_t, W_{t+1})
+""" steps through process """
+- contribution method (C(S_t, x_t, W_{t+1}))
+- sums and stores contributions
+- returns sum
 
 
+Strategy Level 
+- Decisions
+    - 
 
-Initialize Exog_Info object (W_0)
-- simulate exog_info (W_t -> W_{t+1})
-- or source new exog_info (W_{t+1})
+- State variables
+    - 
 
-
-Strategy class
-- make decision based on State
-- return contribution
-- source or generate exog_info
+- Exog_Info
     - market information
     - performance information?
+ 
 
-- transitioning State object
-    - inputs are decision, exog_info
-    - output is updated State object
-
-- 
-
-Solution class
+Solution Level
 
 
-Firm class
-- visualize firm statistics
-    - revenue, cost and profit projections
+Firm Level
+""" visualize firm statistics: revenue, cost and profit projections
+     """
+- Decisions
+    - initiative solution 
+
+- State variables
+    - 
+
+- Exog_Info
     - 
