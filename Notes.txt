@@ -6,14 +6,15 @@ Should we have State objects for each level?
 
 Main loop
 - define set of policies to search over X
-- loop over policies, X^{\pi}
-    - initiate with S_0
-    - loop from t = 0 to t = T
-        - get decision, x_t from X^{\pi}(S_t)
+- initialize Model with S_0 and policies, X
+- loop over policy, X in policies, X^{\pi}
+    - Model object loops from t = 0 to t = T
+        - get decision, x_t from X(S_t)
         - simulate or source next W_t
-        - State transitions (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
-        - calculate contribution, C(S_t, X^\{pi}(S-t), W_{t+1}) and sum and save
-- select policy that maximises sum of contributions
+        - calculate contribution, C(S_t, x_t, W_{t+1})
+        - sum and save contribution
+        - get next state, S_{t+1}, from State transitions (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
+- select policy that maximises sum of contributions over time
 
 Decision Policy class (S_t)
 """ First define the decisions
@@ -21,17 +22,19 @@ Decision Policy class (S_t)
 - decision method (X^{\pi}(S_t) -> x_t)
 - returns x_t
 
-State class (S_t)
+State class (S_t, x_t, W_{t+1})
 """ All information on costs, rewards, constraints, transition function """
 - initialization (S_0)
 - variables ()
 - transition method (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
+    - parameter_inference
+    - forward_simulation
 - returns S_{t+1}
 
 Exog_Info class ()
 """ new information arriving after time, t """
-- simulate method(W_t -> W_{t+1}) 
-- source new exog_info 
+- simulate method(W_t -> W_{t+1}) or  
+- source new exog_info W_{t+1}
 - returns W_{t+1}
 
 Model class (S_t, x_t, W_{t+1})
@@ -41,20 +44,35 @@ Model class (S_t, x_t, W_{t+1})
 - returns sum
 
 
-Strategy Level 
+Strategy Level
+
+- Decisions (x_t)
+    - alpha exists -> in_alpha_pool
+    - no alpha -> not_in_alpha_pool
+    - cum_P&L < monthly_valley -> pause for Y?
+
+- State variables (S_t)
+    - available_strategies
+    - history_daily returns
+    - monthly_valley
+    - alpha
+    - strategy_statistics (for Solution Level)
+
+- Exog_Info (W_{t+1})
+    - strategy_daily_return
+    - strategy_availability
+ 
+Solution Level
 - Decisions
-    - 
+    - initiative solution 
 
 - State variables
-    - 
+    - available_strategies_list
+    - strategy_statistics
+    - score
 
 - Exog_Info
-    - market information
-    - performance information?
- 
-
-Solution Level
-
+    - market_regime
 
 Firm Level
 """ visualize firm statistics: revenue, cost and profit projections
