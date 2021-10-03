@@ -1,0 +1,39 @@
+Initializing State objects (S_0)
+- should we have State objects for each level
+    - one State object per Strategy
+        - 
+    - one State object per Solution
+        - 
+    - State object for Firm
+        - 
+
+Transition State object (S_t -> S_{t + 1})
+- 
+
+
+
+Initialize Exog_Info object (W_0)
+- simulate exog_info (W_t -> W_{t+1})
+- or source new exog_info (W_{t+1})
+
+
+Strategy class
+- make decision based on State
+- return contribution
+- source or generate exog_info
+    - market information
+    - performance information?
+
+- transitioning State object
+    - inputs are decision, exog_info
+    - output is updated State object
+
+- 
+
+Solution class
+
+
+Firm class
+- visualize firm statistics
+    - revenue, cost and profit projections
+    - 
