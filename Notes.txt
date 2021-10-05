@@ -1,8 +1,68 @@
 Design questions
-Should we have State objects for each level?
-    - one State object per Strategy () 
-    - one State object per Solution () 
-    - State object for Firm () 
+How to link to airflow?
+- scheduled (daily, monthly) starts 
+- can we loop within loops?
+- initialize with information from database
+- strategies monitored for alpha to determine alpha pool and calcuate strategy_statistics
+- State is timestamped, indexed (to object?) data held in the database accessible via API
+- State represents current information known
+
+Operating model
+- batch: periodically run to find best decision policies then run best policy
+- online: updating and running policies at the same time
+    - current State, S_0, will be in database 
+        - perhaps we need an initialization function for new strategies
+    - simulate forward to horizon, T 
+        - get decisions for current actions 
+        - update State 
+        - tune parameters for some policies
+        - possibly update decision policies
+
+Main loop
+- daily
+    - for each strategy:
+        - input: latest strategy returns and strategy_availability from exogenous data
+        - run: parameter_inference (pymc3) to learn strategy model/parameters
+        - run: forward_simulation - one month 
+        - update: strategy_statistics into State
+        - decision: strategy inclusion in global_alpha_pool
+        - action: update global_alpha_pool
+    - for each solution:
+        - input: State
+        - run: update solution_alpha_pool
+        - decision: 
+        - action: 
+
+Strategies will be instances of strategy class
+Solutions will be instances of solution class
+Firm will be an instance of firm class
+
+State as database 
+- strategy_data for each strategy
+    - returns_history
+    - model_parameters
+    - strategy_statistics (risk and performance)
+    - alpha_level
+
+- solution_data for each solution
+    - objective_function
+        - parameters
+        - constraints (e.g. asset class, ...)
+    - AUM
+    - weights_history
+    - solution_alpha_pool
+
+
+- firm_data
+    - costs, revenues
+
+
+Each class will have
+- decision_function that returns a decision, X(S_t) -> x_t
+- exog_info_function for sourcing or simulating exogenous data, W_{t+1}
+- objective_function (contributions) for finding the best decision policy X^{\pi} from X
+- transition function to update State and save to database, S^M(S_t, x_t, W_{t+1}) -> S_{t+1}
+- 
 
 Main loop
 - define set of policies to search over X
@@ -27,8 +87,8 @@ State class (S_t, x_t, W_{t+1})
 - initialization (S_0)
 - variables ()
 - transition method (S_{t+1} = S^M(S_t, x_t, W_{t+1}))
-    - parameter_inference
-    - forward_simulation
+    - parameter_inference (pymc3) to learn strategy model/parameters
+    - forward_simulation - one period
 - returns S_{t+1}
 
 Exog_Info class ()
@@ -45,30 +105,46 @@ Model class (S_t, x_t, W_{t+1})
 
 
 Strategy Level
+description: model strategy and find policy for decide whether strategy offers 
+persistent alpha and should stay in alpha_pool
 
+- decision_period: day
 - Decisions (x_t)
     - alpha exists -> in_alpha_pool
     - no alpha -> not_in_alpha_pool
-    - cum_P&L < monthly_valley -> pause for Y?
 
 - State variables (S_t)
-    - available_strategies
-    - history_daily returns
-    - monthly_valley
-    - alpha
-    - strategy_statistics (for Solution Level)
+    - attributes
+        - available_strategies
+        - strategy_daily returns_history
+        - monthly_valley
+        - alpha
+        - strategy_statistics (for Solution Level)
+    - methods
+        - transition_function
+        - update_strategy_statistics
 
 - Exog_Info (W_{t+1})
     - strategy_daily_return
     - strategy_availability
  
 Solution Level
+description: solution management policy including selecting strategies from the
+alpha pool, allocating capital to strategies, pausing or stopping strategies to
+achieve solution objecives  
+
+- decision_period: day
 - Decisions
-    - initiative solution 
+    - select strategies for solution
+    - allocations for solution
+    - manage 
+        - pause, say if cum_P&L < monthly_valley -> pause for pause_period
+        - remove strategy from available_strategies_list
 
 - State variables
     - available_strategies_list
     - strategy_statistics
+    - strategy AUM
     - score
 
 - Exog_Info
@@ -78,7 +154,7 @@ Firm Level
 """ visualize firm statistics: revenue, cost and profit projections
      """
 - Decisions
-    - initiative solution 
+    - initiate solution 
 
 - State variables
     - 
